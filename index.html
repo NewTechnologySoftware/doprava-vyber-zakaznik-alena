@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Výběr dopravy - Aukce</title>
+    <style>
+        :root {
+            --primary: #007bff;
+            --primary-dark: #0056b3;
+            --success: #28a745;
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-main: #333;
+            --text-secondary: #666;
+            --border-radius: 12px;
+            --transition: all 0.2s ease-in-out;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 15px;
+        }
+
+        .container {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 600px;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 22px;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        hr {
+            border: 0;
+            height: 1px;
+            background: #e1e1e1;
+            margin-bottom: 25px;
+        }
+
+        .step {
+            display: none;
+            animation: fadeIn 0.4s ease forwards;
+        }
+
+        .step.active {
+            display: block;
+        }
+
+        p {
+            line-height: 1.5;
+            margin-bottom: 20px;
+            color: var(--text-secondary);
+            font-size: 15px;
+        }
+
+        .highlight-text {
+            color: var(--text-main);
+            font-weight: 600;
+        }
+
+        /* Tlačítka */
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 100%;
+            max-width: 300px;
+            margin-top: 10px;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        /* Karta dopravy */
+        .shipping-options {
+            text-align: left;
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .shipping-card {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border: 2px solid #eee;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+            background: #fff;
+        }
+
+        .shipping-card:hover {
+            border-color: #b3d7ff;
+            background-color: #f8fbff;
+        }
+
+        .shipping-card.selected {
+            border-color: var(--primary);
+            background-color: #f0f7ff;
+            box-shadow: 0 0 0 1px var(--primary);
+        }
+
+        .shipping-card.partner {
+            border-color: #d4edda;
+        }
+        
+        .shipping-card.partner.selected {
+            border-color: var(--success);
+            background-color: #f0fff4;
+            box-shadow: 0 0 0 1px var(--success);
+        }
+
+        /* Input radio */
+        .shipping-card input[type="radio"] {
+            margin-right: 15px;
+            transform: scale(1.3);
+            accent-color: var(--primary);
+            flex-shrink: 0;
+            cursor: pointer;
+        }
+
+        /* Text v kartě */
+        .card-content {
+            flex: 1;
+            padding-right: 10px; /* Odstup od loga */
+        }
+
+        .card-title {
+            font-weight: 600;
+            color: var(--text-main);
+            display: block;
+            margin-bottom: 3px;
+            font-size: 15px;
+            line-height: 1.3;
+        }
+
+        .card-info {
+            font-size: 13px;
+            color: #777;
+        }
+
+        .price-tag {
+            font-weight: bold;
+            color: #444;
+        }
+
+        .price-free {
+            color: var(--success);
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        /* Logo v kartě - čtvercové */
+        .logo-img {
+            width: 45px;
+            height: 45px;
+            object-fit: contain; /* Zachová poměr stran uvnitř čtverce */
+            flex-shrink: 0;
+            background: #fff;
+            border-radius: 6px;
+        }
+
+        /* Animace */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsivita pro mobily */
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 20px;
+            }
+
+            .shipping-card {
+                padding: 12px;
+            }
+
+            .logo-img {
+                width: 40px;
+                height: 40px;
+            }
+
+            .card-title {
+                font-size: 14px;
+            }
+            
+            .card-info {
+                font-size: 12px;
+            }
+
+            .btn {
+                width: 100%;
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Zvolte dopravu</h1>
+    <hr>
+
+    <div id="step-1" class="step active">
+        <p class="highlight-text">Pro běžné výhry v aukcích používáte aktuálně dopravu: <br><strong>Osobní převzetí (Čertoryje 227)</strong></p>
+        <button class="btn" onclick="goToStep2()">Tohle je v pořádku</button>
+    </div>
+
+    <div id="step-2" class="step">
+        <p>Vaše poslední zásilka z vyhrané aukce je typu <strong>RTDB</strong>, to znamená, že si ji nemůžete převzít osobně, ale je možné doručení pouze kurýrem. Zvolte si kurýrní místa výdeje ve Vaší lokalitě Čertoryje - Dub nad Moravou:</p>
+        
+        <p style="text-align: left; font-size: 14px; margin-bottom: 10px; font-weight: 600;">Zvolte si jedno výdejní místo:</p>
+        
+        <div class="shipping-options" id="shipping-list">
+            
+            <label class="shipping-card">
+                <input type="radio" name="courier" value="zasilkovna" 
+                       data-name="Zásilkovna: DZ OIL Dub nad Moravou - Čerpací stanice" 
+                       data-info="Není náš partner, 99 Kč">
+                <div class="card-content">
+                    <span class="card-title">Zásilkovna: DZ OIL Dub nad Moravou</span>
+                    <span class="card-info">Není náš partner, <span class="price-tag">99 Kč</span></span>
+                </div>
+                <img src="zasilkovna.png" alt="Zásilkovna" class="logo-img">
+            </label>
+
+            <label class="shipping-card">
+                <input type="radio" name="courier" value="dpd1" 
+                       data-name="DPD: DZ OIL Dub nad Moravou - Čerpací stanice" 
+                       data-info="Není náš partner, 159 Kč">
+                <div class="card-content">
+                    <span class="card-title">DPD: DZ OIL Dub nad Moravou</span>
+                    <span class="card-info">Není náš partner, <span class="price-tag">159 Kč</span></span>
+                </div>
+                <img src="dpd.png" alt="DPD" class="logo-img">
+            </label>
+
+            <label class="shipping-card">
+                <input type="radio" name="courier" value="dpd2" 
+                       data-name="DPD: PRODOM Šilha Dub nad Moravou" 
+                       data-info="Není náš partner, 159 Kč">
+                <div class="card-content">
+                    <span class="card-title">DPD: PRODOM Šilha Dub nad Moravou</span>
+                    <span class="card-info">Není náš partner, <span class="price-tag">159 Kč</span></span>
+                </div>
+                <img src="dpd.png" alt="DPD" class="logo-img">
+            </label>
+
+             <label class="shipping-card">
+                <input type="radio" name="courier" value="ppl" 
+                       data-name="PPL: MO - Potraviny Lenka, Čertoryje 210" 
+                       data-info="Není náš partner, 89 Kč">
+                <div class="card-content">
+                    <span class="card-title">PPL: MO - Potraviny Lenka, Čertoryje 210</span>
+                    <span class="card-info">Není náš partner, <span class="price-tag">89 Kč</span></span>
+                </div>
+                <img src="ppl.png" alt="PPL" class="logo-img">
+            </label>
+
+            <label class="shipping-card">
+                <input type="radio" name="courier" value="cp" 
+                       data-name="Česká pošta: Pobočka pošta Charváty" 
+                       data-info="Není náš partner, 145 Kč">
+                <div class="card-content">
+                    <span class="card-title">Česká pošta: Pobočka pošta Charváty</span>
+                    <span class="card-info">Není náš partner, <span class="price-tag">145 Kč</span></span>
+                </div>
+                <img src="cp.png" alt="Česká Pošta" class="logo-img">
+            </label>
+
+            <label class="shipping-card partner">
+                <input type="radio" name="courier" value="balikovna1" 
+                       data-name="Balíkovna: Potraviny Charváty Potraviny" 
+                       data-info="Balíkovna Partner, ZDARMA">
+                <div class="card-content">
+                    <span class="card-title">Balíkovna: Potraviny Charváty Potraviny</span>
+                    <span class="card-info">Balíkovna Partner, <span class="price-free">ZDARMA</span></span>
+                </div>
+                <img src="balikovna.png" alt="Balíkovna" class="logo-img">
+            </label>
+
+            <label class="shipping-card partner">
+                <input type="radio" name="courier" value="balikovna2" 
+                       data-name="Balíkovna: Balíkovna na poště Dub nad Moravou, náměstí" 
+                       data-info="Balíkovna Partner, ZDARMA">
+                <div class="card-content">
+                    <span class="card-title">Balíkovna: Pošta Dub nad Moravou, náměstí</span>
+                    <span class="card-info">Balíkovna Partner, <span class="price-free">ZDARMA</span></span>
+                </div>
+                <img src="balikovna.png" alt="Balíkovna" class="logo-img">
+            </label>
+        </div>
+
+        <button class="btn" id="btn-continue" disabled onclick="goToStep3()">Pokračovat</button>
+    </div>
+
+    <div id="step-3" class="step">
+        <p class="highlight-text">Máme na tohle výdejní místo poslat i případné další balíčky typu RTDB, které není možné převzít osobně?</p>
+        <div class="btn-group">
+            <button class="btn" onclick="finishSelection('ANO')">Ano</button>
+            <button class="btn" style="background-color: #6c757d;" onclick="finishSelection('NE')">Ne</button>
+        </div>
+    </div>
+
+    <div id="step-4" class="step">
+        <div style="font-size: 50px; color: var(--success); margin-bottom: 20px;">✓</div>
+        <p class="highlight-text">Děkujeme! Výdejní místo je zvoleno a Váš balíček doručíme na něj.</p>
+        <p>Průběh doručení můžete sledovat v Shoptetu: </p> <a href="https://newtechnologysoftware.github.io/nts-shoptet-preprava-sledovani-userID/">Sledujte svou objednávku zde...</a>
+    </div>
+
+</div>
+
+<script type="module">
+    // Import SDK
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+    // Firebase Config
+    const firebaseConfig = {
+        apiKey: "AIzaSyBa_TUVorlhJj7yOcVsH-mKJL0n3ob7mF8",
+        authDomain: "doprava-aukce.firebaseapp.com",
+        databaseURL: "https://doprava-aukce-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "doprava-aukce",
+        storageBucket: "doprava-aukce.firebasestorage.app",
+        messagingSenderId: "1040474829426",
+        appId: "1:1040474829426:web:80155b35c0485b085848eb"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    // Global variable to store selection temporarily
+    let finalData = {
+        Dorucovatel: "",
+        Info_k_dorucovateli: "",
+        Posilat_Vzdy_timto_dorucovatelem: ""
+    };
+
+    // --- Logic for UI ---
+
+    window.goToStep2 = function() {
+        document.getElementById('step-1').classList.remove('active');
+        document.getElementById('step-2').classList.add('active');
+    };
+
+    window.goToStep3 = function() {
+        // Find selected radio
+        const selectedRadio = document.querySelector('input[name="courier"]:checked');
+        if (selectedRadio) {
+            // Save temporary data
+            finalData.Dorucovatel = selectedRadio.getAttribute('data-name');
+            finalData.Info_k_dorucovateli = selectedRadio.getAttribute('data-info');
+            
+            document.getElementById('step-2').classList.remove('active');
+            document.getElementById('step-3').classList.add('active');
+        }
+    };
+
+    window.finishSelection = function(answer) {
+        finalData.Posilat_Vzdy_timto_dorucovatelem = answer;
+
+        // --- SAVE TO FIREBASE ---
+        const submissionsRef = ref(db, 'submissions');
+        const newSubmissionRef = push(submissionsRef);
+        
+        set(newSubmissionRef, finalData)
+            .then(() => {
+                console.log("Data uložena úspěšně");
+                document.getElementById('step-3').classList.remove('active');
+                document.getElementById('step-4').classList.add('active');
+            })
+            .catch((error) => {
+                console.error("Chyba při ukládání: ", error);
+                alert("Nastala chyba při ukládání dat. Zkuste to prosím znovu.");
+            });
+    };
+
+    // --- Visual selection logic ---
+    const cards = document.querySelectorAll('.shipping-card');
+    const continueBtn = document.getElementById('btn-continue');
+
+    cards.forEach(card => {
+        card.addEventListener('click', function(e) {
+            // Prevent double triggering if clicking directly on radio
+            if (e.target.type !== 'radio') {
+                const radio = this.querySelector('input[type="radio"]');
+                radio.checked = true;
+            }
+
+            // Visual update
+            cards.forEach(c => c.classList.remove('selected'));
+            this.classList.add('selected');
+            
+            // Enable button
+            continueBtn.disabled = false;
+        });
+    });
+</script>
+
+</body>
+</html>
